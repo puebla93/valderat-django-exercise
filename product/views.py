@@ -1,6 +1,7 @@
-from rest_framework import viewsets, generics
+from rest_framework import generics, filters
 from rest_framework.response import Response
 from rest_framework.views import status
+from django_filters.rest_framework import DjangoFilterBackend
 
 from product.models import Prods
 from product.serializers import ProdsSerializer
@@ -9,15 +10,20 @@ from product.serializers import ProdsSerializer
 
 class ListCreateProdsViewSet(generics.ListCreateAPIView):
     """
-    API endpoint that allows prods to be viewed or edited.
+        GET prods/
+        POST prods/
     """
     queryset = Prods.objects.all()
     serializer_class = ProdsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['id', 'ref', 'zipcode', 'store', 'amount']
+    search_fields = ['id', 'ref', 'zipcode', 'store', 'amount']
+    ordering_fields = ['id', 'ref', 'zipcode', 'store', 'amount']
 
 
 class ProdsDetailView(generics.RetrieveAPIView):
     """
-    API endpoint that allows prods to be viewed or edited.
+        GET prods/:id/
     """
     queryset = Prods.objects.all()
     serializer_class = ProdsSerializer
