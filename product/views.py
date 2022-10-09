@@ -13,6 +13,7 @@ class ListCreateProdsViewSet(generics.ListCreateAPIView):
         GET prods/
         POST prods/
     """
+
     queryset = Prods.objects.all()
     serializer_class = ProdsSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -25,6 +26,7 @@ class ProdsDetailView(generics.RetrieveAPIView):
     """
         GET prods/:id/
     """
+
     queryset = Prods.objects.all()
     serializer_class = ProdsSerializer
 
@@ -39,3 +41,29 @@ class ProdsDetailView(generics.RetrieveAPIView):
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+class CoordsProdsView(generics.RetrieveAPIView):
+    """
+        GET coordsprods/
+    """
+
+    fields = ('ref', 'zipcode')
+    queryset = Prods.objects.all().only(*fields)
+    serializer_class = ProdsSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            queryset = page
+
+        result = []
+        for prod in queryset:
+            result.append({
+                "ref": prod.ref,
+                "zipcode": prod.zipcode
+            })
+
+        return Response(result)
