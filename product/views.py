@@ -43,7 +43,7 @@ class ProdsDetailView(generics.RetrieveAPIView):
             )
 
 
-class CoordsProdsView(generics.RetrieveAPIView):
+class CoordsProdsView(generics.ListAPIView):
     """
         GET coordsprods/
     """
@@ -57,13 +57,19 @@ class CoordsProdsView(generics.RetrieveAPIView):
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            queryset = page
+            data = self.get_data(page)
+            return self.get_paginated_response(data)
 
+        data = self.get_data(page)
+        return Response(data)
+
+    def get_data(self, prods):
         result = []
-        for prod in queryset:
+        for prod in prods:
             result.append({
                 "ref": prod.ref,
                 "zipcode": prod.zipcode
             })
+        
+        return result
 
-        return Response(result)
